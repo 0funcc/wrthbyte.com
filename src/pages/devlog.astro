@@ -34,9 +34,7 @@ const posts = files
     </header>
 
     <section class="devlog-list" aria-label="Devlog posts">
-      {posts.length === 0 ? (
-        <p class="devlog-empty">nothing here yet :(</p>
-      ) : (
+      {
         posts.map((post, index) => (
           <article class="devlog-item" style={`--item-index: ${index}`}>
             <time class="devlog-date">{post.date ?? ""}</time>
@@ -56,11 +54,11 @@ const posts = files
             </div>
           </article>
         ))
-      )}
+      }
     </section>
   </main>
 
-    <style>
+  <style>
     .devlog-main {
       width: 100%;
       box-sizing: border-box;
@@ -86,14 +84,6 @@ const posts = files
       letter-spacing: -0.065em;
       text-align: left;
       animation: heading-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    .devlog-empty {
-      font-family: "ServerMono", monospace;
-      font-size: 1rem;
-      color: #1e181a;
-      opacity: 0.6;
-      padding: 2rem 0;
     }
 
     .devlog-intro {
@@ -157,7 +147,9 @@ const posts = files
       line-height: 1.4;
       text-transform: uppercase;
       overflow-wrap: anywhere;
-      transition: transform 0.25s ease, opacity 0.25s ease;
+      transition:
+        transform 0.25s ease,
+        opacity 0.25s ease;
     }
 
     .devlog-link:hover h2 {
@@ -191,7 +183,9 @@ const posts = files
       letter-spacing: 0.08em;
       text-decoration: none;
       white-space: nowrap;
-      transition: letter-spacing 0.25s ease, opacity 0.25s ease;
+      transition:
+        letter-spacing 0.25s ease,
+        opacity 0.25s ease;
     }
 
     .read-link:hover {
