@@ -1,0 +1,84 @@
+---
+import Navbar from "../components/Navbar.astro";
+import "../styles/global.css";
+
+const { title = "WRTH BYTE" } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Navbar />
+    <div class="content">
+      <slot />
+    </div>
+    <footer class="footer">
+      <div class="footer-logo-wrap">
+        <img src="/wrthbyte-logo-full-width.svg" alt="Wrthbyte Logo Full Width" class="footer-logo">
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  :root {
+    --logo-color: #1E181A;
+  }
+
+  :global(html),
+  :global(body) {
+    margin: 0;
+    min-height: 100%;
+  }
+
+  :global(body) {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  :global(.content) {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .footer {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--logo-color);
+    border-top: 2px solid var(--logo-color);
+    border-bottom: 2px solid var(--logo-color);
+    padding: 2rem 0;
+  }
+
+  .footer-logo-wrap {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+
+  .footer-logo {
+    width: 100%;
+    height: auto;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-drag: none;
+    filter: invert(1);
+  }
+</style>

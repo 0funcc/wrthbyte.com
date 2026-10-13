@@ -1,0 +1,288 @@
+---
+import Layout from "../layouts/Layout.astro";
+import fs from "node:fs";
+import path from "node:path";
+
+const dir = "src/content/devlog";
+const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
+
+const posts = files
+  .map((f) => {
+    const raw = fs.readFileSync(path.join(dir, f), "utf8");
+    const titleMatch = raw.match(/^title:\s*(.+)$/m);
+    const dateMatch = raw.match(/^date:\s*(.+)$/m);
+    const descriptionMatch = raw.match(/^description:\s*(.+)$/m);
+
+    return {
+      slug: f.replace(/\.md$/, ""),
+      title: titleMatch
+        ? titleMatch[1].trim().replace(/^["']|["']$/g, "")
+        : f.replace(/\.md$/, ""),
+      date: dateMatch ? dateMatch[1].trim().replace(/^["']|["']$/g, "") : null,
+      description: descriptionMatch
+        ? descriptionMatch[1].trim().replace(/^["']|["']$/g, "")
+        : null,
+    };
+  })
+  .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+---
+
+<Layout title="Devlog">
+  <main class="devlog-main">
+    <header class="devlog-header">
+      <h1 class="devlog-heading">DEVLOG</h1>
+    </header>
+
+    <section class="devlog-list" aria-label="Devlog posts">
+      {posts.length === 0 ? (
+        <p class="devlog-empty">nothing here yet :(</p>
+      ) : (
+        posts.map((post, index) => (
+          <article class="devlog-item" style={`--item-index: ${index}`}>
+            <time class="devlog-date">{post.date ?? ""}</time>
+
+            <div class="devlog-content">
+              <a href={`/posts/${post.slug}/`} class="devlog-link">
+                <h2>{post.title}</h2>
+              </a>
+
+              {post.description && (
+                <p class="devlog-description">{post.description}</p>
+              )}
+
+              <a href={`/posts/${post.slug}/`} class="read-link">
+                READ <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </article>
+        ))
+      )}
+    </section>
+  </main>
+
+    <style>
+    .devlog-main {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 5rem 2rem 7rem;
+    }
+
+    /* Heading */
+
+    .devlog-header {
+      width: 100%;
+      padding-bottom: 2.5rem;
+      border-bottom: 2px solid #1e181a;
+      animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .devlog-heading {
+      margin: 0;
+      color: #1e181a;
+      font-family: "Inter", sans-serif;
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      font-weight: 700;
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      text-align: left;
+      animation: heading-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .devlog-empty {
+      font-family: "ServerMono", monospace;
+      font-size: 1rem;
+      color: #1e181a;
+      opacity: 0.6;
+      padding: 2rem 0;
+    }
+
+    .devlog-intro {
+      max-width: 32rem;
+      margin: 1.5rem 0 0;
+      color: #1e181a;
+      font-family: "ServerMono", monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      opacity: 0.7;
+    }
+
+    /* Post list */
+
+    .devlog-list {
+      width: 100%;
+    }
+
+    .devlog-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 8rem minmax(0, 1fr);
+      gap: 2rem;
+      padding: 2rem 7rem 2rem 0;
+      border-bottom: 1px solid rgb(30 24 26 / 30%);
+      animation: reveal-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--item-index, 0) * 100ms + 150ms);
+      transition: border-color 0.25s ease;
+    }
+
+    .devlog-item:hover {
+      border-bottom-color: #1e181a;
+    }
+
+    .devlog-date {
+      padding-top: 0.4rem;
+      color: #1e181a;
+      font-family: "ServerMono", monospace;
+      font-size: 0.75rem;
+      line-height: 1.6;
+      opacity: 0.6;
+    }
+
+    .devlog-content {
+      min-width: 0;
+    }
+
+    /* Post title */
+
+    .devlog-link {
+      display: inline-block;
+      color: #1e181a;
+      text-decoration: none;
+    }
+
+    .devlog-link h2 {
+      margin: 0;
+      font-family: "ServerMono", monospace;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      font-weight: 700;
+      line-height: 1.4;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .devlog-link:hover h2 {
+      transform: translateX(6px);
+      opacity: 0.7;
+    }
+
+    .devlog-description {
+      max-width: 42rem;
+      margin: 0.8rem 0 0;
+      color: #1e181a;
+      font-family: "ServerMono", monospace;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      opacity: 0.7;
+    }
+
+    /* Read link: anchored to the far right of each post row */
+
+    .read-link {
+      position: absolute;
+      right: 0;
+      bottom: 2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.35rem;
+      color: #1e181a;
+      font-family: "ServerMono", monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: letter-spacing 0.25s ease, opacity 0.25s ease;
+    }
+
+    .read-link:hover {
+      letter-spacing: 0.14em;
+      opacity: 0.65;
+    }
+
+    .read-link span {
+      display: inline-block;
+      transition: transform 0.25s ease;
+    }
+
+    .read-link:hover span {
+      transform: translateX(3px);
+    }
+
+    /* Entrance animations */
+
+    @keyframes reveal-up {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes heading-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+        clip-path: inset(0 0 100% 0);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+    /* Responsive */
+
+    @media (max-width: 600px) {
+      .devlog-main {
+        padding: 3.5rem 1.25rem 5rem;
+      }
+
+      .devlog-header {
+        padding-bottom: 2rem;
+      }
+
+      .devlog-item {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+        padding: 1.5rem 0 3.5rem;
+      }
+
+      .devlog-date {
+        padding-top: 0;
+      }
+
+      .read-link {
+        right: 0;
+        bottom: 1.25rem;
+      }
+    }
+
+    /* Accessibility */
+
+    @media (prefers-reduced-motion: reduce) {
+      .devlog-header,
+      .devlog-heading,
+      .devlog-item {
+        animation: none;
+      }
+
+      .devlog-item,
+      .devlog-link h2,
+      .read-link,
+      .read-link span {
+        transition: none;
+      }
+
+      .devlog-link:hover h2,
+      .read-link:hover span {
+        transform: none;
+      }
+    }
+  </style>
+</Layout>

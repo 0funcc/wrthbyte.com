@@ -1,0 +1,111 @@
+<nav class="navbar">
+    <a href="/" class="logo">
+        <img src="/wrthbyte-logo.svg" alt="Wrthbyte Logo" />
+    </a>
+
+    <div class="nav-links">
+        <a href="/devlog" class="nav-link">
+            <span class="link-bg"></span>
+            <span class="link-label">Devlog</span>
+        </a>
+
+        <a href="/contact" class="nav-link">
+            <span class="link-bg"></span>
+            <span class="link-label">Contact</span>
+        </a>
+    </div>
+</nav>
+
+<style>
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem;
+        border-top: 2px solid #1e181a;
+        border-bottom: 2px solid #1e181a;
+    }
+
+    /* Logo */
+
+    .logo {
+        display: block;
+        width: 100%;
+        max-width: 100px;
+    }
+
+    .logo img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    /* Navigation */
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .nav-link {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        padding: 0.7rem 1rem;
+        font-family: "ServerMono", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-decoration: none;
+        color: #1e181a;
+    }
+
+    /* Dark background that sweeps in */
+
+    .link-bg {
+        position: absolute;
+        inset: 0;
+        background-color: #1e181a;
+        transform: scaleX(0);
+        transform-origin: left center;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    /* Text above the background */
+
+    .link-label {
+        position: relative;
+        z-index: 1;
+        color: #1e181a;
+        transition: color 0.15s ease;
+    }
+
+    .nav-link:hover .link-label {
+        color: #ac0013;
+    }
+</style>
+
+<script>
+    import gsap from "gsap";
+
+    document.querySelectorAll(".nav-link").forEach((link) => {
+        const background = link.querySelector(".link-bg");
+
+        const animation = gsap.timeline({ paused: true });
+
+        animation.to(background, {
+            scaleX: 1,
+            duration: 0.2,
+            ease: "power3.inOut",
+        });
+
+        link.addEventListener("mouseenter", () => {
+            animation.play();
+        });
+
+        link.addEventListener("mouseleave", () => {
+            animation.reverse();
+        });
+    });
+</script>

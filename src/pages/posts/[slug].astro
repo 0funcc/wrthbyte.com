@@ -1,0 +1,352 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import fs from "node:fs";
+import path from "node:path";
+import { marked } from "marked";
+
+export function getStaticPaths() {
+  const dir = path.resolve("src/content/devlog");
+  const files = fs.readdirSync(dir).filter((file) => file.endsWith(".md"));
+
+  return files.map((file) => ({
+    params: { slug: file.replace(/\.md$/, "") },
+    props: { file },
+  }));
+}
+
+const { file } = Astro.props;
+const filePath = path.resolve("src/content/devlog", file);
+const raw = fs.readFileSync(filePath, "utf8");
+
+const frontmatterMatch = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
+
+const frontmatter = frontmatterMatch?.[1] ?? "";
+const markdown = (frontmatterMatch?.[2] ?? raw).trim();
+
+const titleMatch = frontmatter.match(/^title:\s*["']?(.+?)["']?\s*$/m);
+const dateMatch = frontmatter.match(/^date:\s*["']?(.+?)["']?\s*$/m);
+
+const title = titleMatch?.[1] ?? file.replace(/\.md$/, "");
+const date = dateMatch?.[1] ?? null;
+const html = await marked.parse(markdown);
+---
+
+<Layout title={title}>
+  <main class="post-main">
+    <article class="post-content">
+      <a class="back-link" href="/devlog/">
+        <span class="back-arrow" aria-hidden="true">←</span>
+        BACK TO DEVLOG
+      </a>
+
+      <header class="post-header">
+        <h1>{title}</h1>
+        {date && <time class="post-date">{date}</time>}
+      </header>
+
+      <div class="post-body" set:html={html} />
+    </article>
+  </main>
+
+  <style>
+    /* Page layout */
+
+    .post-main {
+      width: 100%;
+      padding: clamp(3rem, 7vw, 6rem) clamp(1.25rem, 5vw, 5rem);
+      color: #1e181a;
+      text-align: left;
+      box-sizing: border-box;
+    }
+
+    .post-content {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Back navigation */
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 3rem;
+      color: #1e181a;
+      font-family: "ServerMono", monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      animation: fade-in 0.6s ease both;
+      animation-delay: 100ms;
+    }
+
+    .back-arrow {
+      display: inline-block;
+      transition: transform 0.25s ease;
+    }
+
+    .back-link:hover .back-arrow {
+      transform: translateX(-4px);
+    }
+
+    .back-link:hover {
+      opacity: 0.65;
+    }
+
+    /* Article heading */
+
+    .post-header {
+      padding-bottom: 1.5rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 2px solid #1e181a;
+    }
+
+    .post-content h1 {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      overflow-wrap: anywhere;
+      animation: title-reveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: 150ms;
+    }
+
+    .post-date {
+      display: block;
+      margin-top: 1rem;
+      color: #1e181a;
+      font-family: "ServerMono", monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      opacity: 0.65;
+      animation: fade-in 0.6s ease both;
+      animation-delay: 350ms;
+    }
+
+    /* Article content */
+
+    .post-body {
+      color: #1e181a;
+      font-family: "ServerMono", monospace;
+      font-size: 1rem;
+      line-height: 1.8;
+      letter-spacing: 0.01em;
+      overflow-wrap: anywhere;
+    }
+
+    /* Stagger Markdown elements */
+
+    .post-body :global(> *) {
+      animation: content-reveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .post-body :global(> :nth-child(1)) {
+      animation-delay: 250ms;
+    }
+
+    .post-body :global(> :nth-child(2)) {
+      animation-delay: 320ms;
+    }
+
+    .post-body :global(> :nth-child(3)) {
+      animation-delay: 390ms;
+    }
+
+    .post-body :global(> :nth-child(4)) {
+      animation-delay: 460ms;
+    }
+
+    .post-body :global(> :nth-child(5)) {
+      animation-delay: 530ms;
+    }
+
+    .post-body :global(> :nth-child(n + 6)) {
+      animation-delay: 580ms;
+    }
+
+    /* Markdown headings */
+
+    .post-body :global(h2),
+    .post-body :global(h3),
+    .post-body :global(h4) {
+      margin: 2.5rem 0 1rem;
+      color: #1e181a;
+      font-family: "Inter", sans-serif;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .post-body :global(h2) {
+      font-size: 1.75rem;
+    }
+
+    .post-body :global(h3) {
+      font-size: 1.35rem;
+    }
+
+    .post-body :global(h4) {
+      font-size: 1.1rem;
+    }
+
+    /* Paragraphs and lists */
+
+    .post-body :global(p) {
+      margin: 0 0 1.5rem;
+    }
+
+    .post-body :global(ul),
+    .post-body :global(ol) {
+      margin: 0 0 1.5rem;
+      padding-left: 1.5rem;
+    }
+
+    .post-body :global(li) {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Links */
+
+    .post-body :global(a) {
+      color: #1e181a;
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      transition: opacity 0.2s ease;
+    }
+
+    .post-body :global(a:hover) {
+      opacity: 0.6;
+    }
+
+    /* Blockquotes */
+
+    .post-body :global(blockquote) {
+      margin: 2rem 0;
+      padding-left: 1.25rem;
+      border-left: 3px solid #1e181a;
+      color: #5c5355;
+    }
+
+    /* Code blocks */
+
+    .post-body :global(pre) {
+      max-width: 100%;
+      overflow-x: auto;
+      padding: 1.25rem;
+      background: #1e181a;
+      color: #f5f0e8;
+      line-height: 1.6;
+    }
+
+    .post-body :global(code) {
+      font-size: 0.9em;
+    }
+
+    .post-body :global(:not(pre) > code) {
+      padding: 0.15rem 0.35rem;
+      background: rgb(30 24 26 / 8%);
+    }
+
+    /* Images */
+
+    .post-body :global(img) {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 2rem 0;
+    }
+
+    /* Dividers */
+
+    .post-body :global(hr) {
+      margin: 2rem 0;
+      border: 0;
+      border-top: 1px solid #1e181a;
+    }
+
+    /* Animations */
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes title-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+        clip-path: inset(0 0 100% 0);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+    @keyframes content-reveal {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Mobile */
+
+    @media (max-width: 600px) {
+      .post-main {
+        padding-top: 3rem;
+      }
+
+      .back-link {
+        margin-bottom: 2rem;
+      }
+
+      .post-header {
+        margin-bottom: 2rem;
+      }
+
+      .post-body {
+        font-size: 0.95rem;
+      }
+
+      .post-body :global(pre) {
+        padding: 1rem;
+      }
+    }
+
+    /* Accessibility */
+
+    @media (prefers-reduced-motion: reduce) {
+      .back-link,
+      .post-content h1,
+      .post-date,
+      .post-body :global(> *) {
+        animation: none;
+        clip-path: none;
+      }
+
+      .back-arrow,
+      .post-body :global(a) {
+        transition: none;
+      }
+
+      .back-link:hover .back-arrow {
+        transform: none;
+      }
+    }
+  </style>
+</Layout>
