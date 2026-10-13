@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const dir = "src/content/devlog";
-const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md"));
+const files = fs.readdirSync(dir).filter((f) => f.endsWith(".md") || f.endsWith(".mdx"));
 
 const posts = files
   .map((f) => {
@@ -14,7 +14,7 @@ const posts = files
     const descriptionMatch = raw.match(/^description:\s*(.+)$/m);
 
     return {
-      slug: f.replace(/\.md$/, ""),
+      slug: f.replace(/\.(mdx?)$/, ""),
       title: titleMatch
         ? titleMatch[1].trim().replace(/^["']|["']$/g, "")
         : f.replace(/\.md$/, ""),
