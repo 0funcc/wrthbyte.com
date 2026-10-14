@@ -17,7 +17,7 @@ const posts = files
       slug: f.replace(/\.(mdx?)$/, ""),
       title: titleMatch
         ? titleMatch[1].trim().replace(/^["']|["']$/g, "")
-        : f.replace(/\.md$/, ""),
+        : f.replace(/\.(mdx?)$/, ""),
       date: dateMatch ? dateMatch[1].trim().replace(/^["']|["']$/g, "") : null,
       description: descriptionMatch
         ? descriptionMatch[1].trim().replace(/^["']|["']$/g, "")

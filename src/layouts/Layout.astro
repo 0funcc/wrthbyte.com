@@ -10,6 +10,8 @@ const { title = "WRTH BYTE" } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.ico" type="image/x-icon" />
   </head>
   <body>
     <Navbar />
@@ -57,7 +59,7 @@ const { title = "WRTH BYTE" } = Astro.props;
     background-color: var(--logo-color);
     border-top: 2px solid var(--logo-color);
     border-bottom: 2px solid var(--logo-color);
-    padding: 2rem 0;
+    padding: 2rem 0 env(safe-area-inset-bottom);
   }
 
   .footer-logo-wrap {
